@@ -1,0 +1,74 @@
+name: WireGuardVPN
+options:
+  bundleIdPrefix: com.riovpn
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  xcodeVersion: "16"
+
+packages:
+  WireGuardKit:
+    path: Packages/WireGuardKit
+
+targets:
+  WireGuardVPN:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: WireGuardVPN
+    entitlements:
+      path: WireGuardVPN/WireGuardVPN.entitlements
+      properties:
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
+        com.apple.security.application-groups:
+          - group.com.riovpn.freevpn
+    info:
+      path: WireGuardVPN/Info.plist
+      properties:
+        CFBundleDisplayName: WireGuard VPN
+        NSVPNUsageDescription: "WireGuard VPN needs network extension access to protect your connection."
+        UILaunchScreen:
+          UIColorName: ""
+        UIRequiresFullScreen: true
+    dependencies:
+      - target: WireGuardVPNExtension
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.riovpn.freevpn
+        SWIFT_VERSION: "5.9"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 8AYSN56UZG
+
+  WireGuardVPNExtension:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: WireGuardVPNExtension
+    entitlements:
+      path: WireGuardVPNExtension/WireGuardVPNExtension.entitlements
+      properties:
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
+        com.apple.security.application-groups:
+          - group.com.riovpn.freevpn
+    info:
+      path: WireGuardVPNExtension/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+    dependencies:
+      - package: WireGuardKit
+        product: WireGuardKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.riovpn.freevpn.WireGuardVPNExtension
+        SWIFT_VERSION: "5.9"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 8AYSN56UZG
